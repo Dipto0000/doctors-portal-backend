@@ -8,8 +8,8 @@ const port = process.env.PORT || 5000;
 app.use(cors());
 app.use(express.json());
 
-const uri =
-  "mongodb+srv://db_admin:obTIc8MrMOnPXrk4@cluster0.wvuwslc.mongodb.net/?retryWrites=true&w=majority";
+const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.wvuwslc.mongodb.net/?retryWrites=true&w=majority`;
+console.log(uri);
 const client = new MongoClient(uri, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
@@ -33,7 +33,11 @@ async function run() {
     // a post api for bookings
     app.post("/booking", async (req, res) => {
       const booking = req.body;
-      const query = {treatment: booking.treatment, date: booking.date, patient: booking.patient };
+      const query = {
+        treatment: booking.treatment,
+        date: booking.date,
+        patient: booking.patient,
+      };
       const exists = await bookingCollection.findOne(query);
       if (exists) {
         return res.send({ success: false, booking: exists });
