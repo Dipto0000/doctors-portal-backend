@@ -21,15 +21,25 @@ async function run() {
     const serviceCollection = client
       .db("doctors-portal")
       .collection("services");
+    const bookingCollection = client
+      .db("doctors-portal")
+      .collection("bookings");
 
     app.get("/service", async (req, res) => {
-      // const query = {};
-      // const cursor = serviceCollection.find(query);
-      // const services = await cursor.toArray();
-      // const result = await serviceCollection.find({}).toArray();
       const result = await serviceCollection.find({});
       const services = await result.toArray();
       res.send(services);
+    });
+    // a post api for bookings
+    app.post("/booking", async (req, res) => {
+      const booking = req.body;
+      const query = {treatment: booking.treatment, date: booking.date, patient: booking.patient };
+      const exists = await bookingCollection.findOne(query);
+      if (exists) {
+        return res.send({ success: false, booking: exists });
+      }
+      const result = await bookingCollection.insertOne(booking);
+      return res.send({ success: true, result });
     });
   } finally {
   }
